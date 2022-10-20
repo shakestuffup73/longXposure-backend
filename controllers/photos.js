@@ -1,4 +1,5 @@
 import { Photo } from '../models/photo.js'
+import { Profile } from '../models/profile.js'
 
 function create(req, res) {
   for (let key in req.body) {
@@ -61,11 +62,33 @@ function updatePhoto(req, res) {
   })
 }
 
+const createComment = async (req, res) => {
+  try {
+    req.body.author = req.user.profile
+    const photo = await Photo.findById(req.params.id)
+    photo.comments.push(req.body)
+    await photo.save()
+
+    // Find the newly created comment:
+    const newComment = photo.comments[photo.comments.length - 1]
+
+    // Temporarily append profile object to newComment.author:
+    const profile = await Profile.findById(req.user.profile)
+    newComment.author = profile
+
+		// Respond with the newComment:
+    res.status(201).json(newComment)
+  } catch (err) {
+    res.status(500).json(err)
+  }
+}
+
 
 export {
   create,
   show,
   index,
   deletePhoto as delete,
-  updatePhoto as update
+  updatePhoto as update,
+  createComment
 }

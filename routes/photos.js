@@ -6,17 +6,15 @@ const router = Router()
 
 /* ---- Public Routes ---- */
 router.get('/', photosCtrl.index)
-router.get('/:id', photosCtrl.show)
-router.post('/', photosCtrl.create)
-router.put('/:id', photosCtrl.update)
-router.delete('/:id', photosCtrl.delete)
 
 
 /* ---- Protected Routes ---- */
-
 router.use(decodeUserFromToken)
-
-
+router.get('/:id', checkAuth, photosCtrl.show)
+router.post('/', checkAuth, photosCtrl.create)
+router.put('/:id', checkAuth, photosCtrl.update)
+router.delete('/:id', checkAuth, photosCtrl.delete)
+router.post('/:id/comments', checkAuth, photosCtrl.createComment)
 
 
 export {
